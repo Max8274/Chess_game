@@ -1,0 +1,1 @@
+conda activate Chess_Environment & python -m project.chess_engines.example_engine
