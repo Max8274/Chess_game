@@ -12,7 +12,7 @@ from project.chess_utilities.utility import Utility
 
 
 class Agent(ABC):
-
+    deltaTime = 0.1
     # Initialize your agent with whatever parameters you want
     def __init__(self, utility: Utility, time_limit_move: float) -> None:
         """Setup the Search Agent"""
@@ -20,125 +20,106 @@ class Agent(ABC):
         self.time_limit_move = time_limit_move
         self.name = "search agent chesser"
         self.author = "Maxime, Abe, Thijs"
+        self.deltaTime = 0.01
 
 
 
-    def max_function(self, board: chess.Board,dept,alpha, beta):
-        dept = dept -1
-        best_utility = -111110
-        best_move = None
-        if dept <= 0:
-            currentValue = self.utility.board_value(board)
-            return currentValue,best_move
+    def max_function(self, board: chess.Board,dept,alpha, beta,start_time):
+        if(time.time()-start_time<self.time_limit_move-self.deltaTime):
+            dept = dept -1
+            best_utility = -float('inf')
+            moves = list(board.legal_moves)
+            if len(moves)>0:
+                best_move = moves[0]
+            else:
+                best_move = None
+                best_utility =-10000
+            if dept <= 0:
+                currentValue = self.utility.board_value(board)
+                return currentValue,best_move
 
 
-        for move in list(board.legal_moves):
-            #print("move "+ str(move))
-            #print("")
-            # Play the move
-            board.push(move)
+            for move in moves:
+                board.push(move)
 
-
-            currentValue,worst_move = self.min_function(board,dept, alpha, beta)
-            if currentValue > best_utility:
-                #print("move beter")
-                #print(str(move) +"worsts "+ str(worst_utility) + "best " +str(best_utility))
-                best_move = move
-                best_utility = currentValue
-            if currentValue> alpha:
-                alpha = currentValue
-            if beta<= alpha:
-                #print("beta "+str(beta))
-                #print(best_move)
+                currentValue,worst_move = self.min_function(board,dept, alpha, beta, start_time)
+                if currentValue > best_utility:
+                    best_move = move
+                    best_utility = currentValue
+                if currentValue> alpha:
+                    alpha = currentValue
+                if beta<= alpha:
+                    board.pop()
+                    return best_utility,best_move
                 board.pop()
-                return best_utility,best_move
-            board.pop()
-        if best_move == None:
-            best_utility = 100000000
+                if (worst_move == None) & board.is_stalemate():
+                    best_utility = 100000000
+                """elif worst_move == None:
+                    if currentValue>0:
+                        best_utility = -100
+                    else:
+                        best_utility = 100"""
+        else:
+            best_utility = -99999999
+            best_move = None
         return best_utility,best_move
 
 
 
-    def min_function(self, board: chess.Board, dept, alpha, beta):
-        dept = dept -1
-        worst_utility = 100000000000
-        worst_move = None
-        if dept <= 0:
-            currentValue = self.utility.board_value(board)
-        for move in list(board.legal_moves):
+    def min_function(self, board: chess.Board, dept, alpha, beta, start_time):
+        if(time.time()-start_time<self.time_limit_move-self.deltaTime):
+            dept = dept -1
+            worst_utility = float('inf')
+            moves = list(board.legal_moves)
+            if len(moves)>0:
+                worst_move = moves[0]
+            else:
+                worst_move = None
+                worst_utility = 10000
+            if dept <= 0:
+                currentValue = self.utility.board_value(board)
+                return currentValue,worst_move
+            for move in moves:
 
-            board.push(move)
-            currentValue,best_move = self.max_function(board,dept,alpha, beta)
-            #print("move2"+ str(move) +"   value   "+ str(currentValue))
-            # If this is better than all other previous moves, store this move and its utility
-            if currentValue < worst_utility:
-                print("move2 slechter!!!!"+ str(currentValue))
-                worst_move = move
-                worst_utility = currentValue
-            if currentValue <beta:
-                beta = currentValue
-            if beta<= alpha:
-                #print(worst_utility)
-                #print("worstmove" + str(worst_move))
+                board.push(move)
+                currentValue,best_move = self.max_function(board,dept,alpha, beta,start_time)
+                if currentValue < worst_utility:
+                    worst_move = move
+                    worst_utility = currentValue
+                if currentValue <beta:
+                    beta = currentValue
+                if beta<= alpha:
+                    board.pop()
+                    return worst_utility,worst_move
                 board.pop()
-                return worst_utility,worst_move
-            board.pop()
-        if worst_move == None:
-            worst_utility = -100000000
+
+                if (best_move == None) & board.is_stalemate():
+                    worst_utility = -100000000
+                """elif worst_move == None:
+                    if currentValue>0:
+                        worst_utility = 20
+                    else:
+                        worst_utility = -20"""
+        else:
+            worst_utility = -99999999
+            worst_move = None
         return worst_utility, worst_move
 
     def calculate_move(self, board: chess.Board):
         start_time = time.time()
-        print("calculatemove")
         nogtijd = True
-        dept = 3
+        dept = 2
         while (nogtijd):
-            if(time.time()-start_time>self.time_limit_move/2):
-                if board.turn == chess.WHITE:
-                    value,move = self.max_function(board,dept,-999999999,999999999)
-                else:
-                    value, move = self.min_function(board,dept,-999999999,999999999)
-        return move
-        """
-        start_time = time.time()
-
-        # If the agent is playing as black, the utility values are flipped (negative-positive)
-        flip_value = 1 if board.turn == chess.WHITE else -1
-
-        #best_move = random.sample(list(board.legal_moves), 1)[0]
-        best_utility = -111110
-
-        # Loop trough all legal moves
-        for move in list(board.legal_moves):
-            print("move "+ str(move))
-            print("")
-            # Check if the maximum calculation time for this move has been reached
-            if time.time() - start_time > self.time_limit_move:
-                break
-            # Play the move
-            board.push(move)
-            worst_utility = 1000
-            for move2 in list(board.legal_moves):
-
-                board.push(move2)
-                value = flip_value * self.utility.board_value(board)
-                print("move2"+ str(move2) +"   value   "+ str(value))
-                # If this is better than all other previous moves, store this move and its utility
-                if value < worst_utility:
-                    print("move2 slechter!!!!"+ str(value))
-                    worst_move = move2
-                    worst_utility = value
-                board.pop()
-
-            # If this is better than all other previous moves, store this move and its utility
-            if worst_utility > best_utility:
-                print("move beter")
-                print(str(move) +"worsts "+ str(worst_utility) + "best " +str(best_utility))
-                best_move = move
-                best_utility = worst_utility
-
-            # Revert the board to its original state
-            board.pop()
-            
-        return best_move
-"""
+            dept = dept+1
+            print("dept" + str(dept))
+            if board.turn == chess.WHITE:
+                value,move = self.max_function(board,dept,-999999999,999999999, start_time)
+            else:
+                value, move = self.min_function(board,dept,-999999999,999999999,start_time)
+            if(time.time()-start_time<self.time_limit_move-self.deltaTime):
+                bestMove = move
+            else:
+                nogtijd = False
+            print("value: "+ str(value))
+        print("time" + str(time.time()-start_time))
+        return bestMove
