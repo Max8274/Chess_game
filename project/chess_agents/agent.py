@@ -11,9 +11,10 @@ class Agent(ABC):
     def __init__(self, utility: Utility, time_limit_move: float) -> None:
         """Setup the Search Agent"""
         self.utility = utility
-        self.time_limit_move = 15
+        self.time_limit_move = time_limit_move
         self.start_time = 0
-        self.no_time_anymore = False
+        self.still_time = True
+        self.last_max_value = 0
         self.is_max_player = False
         self.name = "Search agent MAT" #MAT = Maxime Abe Thijs
         self.author = "Maxime, Abe, Thijs"
@@ -26,53 +27,72 @@ class Agent(ABC):
             return self.utility.board_value(board), best_move
 
         if is_max_player:
-            max_value = float('-inf')
-            for move in list(board.legal_moves):
-                # Play the move
-                board.push(move)
-                current_value, current_move = self.minimaxWithPruning(board, depth, False, alpha, beta)
-                if current_value > max_value:
-                    best_move = move
-                    max_value = current_value
-                if current_value > alpha:
-                    alpha = current_value
-                #pruning
-                if beta <= alpha:
-                    break
-                # Revert the board to its original state
-                board.pop()
+            if time.time() - self.start_time < self.time_limit_move-0.5:
+                max_value = float('-inf')
+                for move in list(board.legal_moves):
+                    # Play the move
+                    board.push(move)
+                    current_value, current_move = self.minimaxWithPruning(board, depth, False, alpha, beta)
+                    if current_value > max_value:
+                        best_move = move
+                        max_value = current_value
+                    if current_value > alpha:
+                        alpha = current_value
+                    #pruning
+                    if beta <= alpha:
+                        board.pop()
+                        break
+                    # Revert the board to its original state
+                    board.pop()
+            else:
+                max_value = float('-inf')
+                best_move = None
             return max_value, best_move
 
         else:
-            min_value = float('inf')
-            for move in list(board.legal_moves):
-                # Play the move
-                board.push(move)
-                current_value, current_move = self.minimaxWithPruning(board, depth, True, alpha, beta)
-                if current_value < min_value:
-                    best_move = move
-                    min_value = current_value
-                if current_value < beta:
-                    beta = current_value
-                #pruning
-                if beta <= alpha:
-                    break
-                # Revert the board to its original state
-                board.pop()
+            if time.time() - self.start_time < self.time_limit_move-0.5:
+                min_value = float('inf')
+                for move in list(board.legal_moves):
+                    # Play the move
+                    board.push(move)
+                    current_value, current_move = self.minimaxWithPruning(board, depth, True, alpha, beta)
+                    if current_value < min_value:
+                        best_move = move
+                        min_value = current_value
+                    if current_value < beta:
+                        beta = current_value
+                    #pruning
+                    if beta <= alpha:
+                        board.pop()
+                        break
+                    # Revert the board to its original state
+                    board.pop()
+            else:
+                min_value = float('inf')
+                best_move = None
             return min_value, best_move
 
     def calculate_move(self, board: chess.Board):
-        if board.turn == chess.WHITE:
-            self.is_max_player = True
-            #self.start_time = time.time()
-            value,move = self.minimaxWithPruning(board, 4, self.is_max_player, float('-inf'), float('inf'))
-        else:
-            self.is_max_player = False
-            #self.start_time = time.time()
-            value, move = self.minimaxWithPruning(board, 3, self.is_max_player, float('inf'), float('-inf'))
-        #self.start_time = 0
-        #self.no_time_anymore = False
-        return move
+        depth = 2
+        best_move = None
+        self.start_time = time.time()
+        while self.still_time:
+            depth += 1
+            print('depth: ' + str(depth))
+            print('time: ' + str(time.time()-self.start_time))
+            if board.turn == chess.WHITE:
+                self.is_max_player = True
+                value,move = self.minimaxWithPruning(board, depth, self.is_max_player, float('-inf'), float('inf'))
+            else:
+                self.is_max_player = False
+                value, move = self.minimaxWithPruning(board, depth, self.is_max_player, float('-inf'), float('inf'))
+
+            if self.start_time < self.time_limit_move-0.5:
+                best_move = move
+            else:
+                self.still_time = False
+
+        return best_move
 """
     def calculate_move(self, board: chess.Board):
         global best_move

@@ -67,12 +67,12 @@ class Utility(ABC):
 
     # Determine the value of the current board position (high is good for white, low is good for black, 0 is neutral)
     def board_value(self, board: chess.Board):
-        pawnWPlaceScore = sum([self.pawnWhite[i] for i in board.pieces(chess.PAWN, chess.WHITE)])
-        bishopWPlaceScore = sum([self.bishopWhite[i] for i in board.pieces(chess.BISHOP, chess.WHITE)])
-        knightWPlaceScore = sum([self.knightWhite[i] for i in board.pieces(chess.KNIGHT, chess.WHITE)])
-        rookWPlaceScore = sum([self.rookWhite[i] for i in board.pieces(chess.ROOK, chess.WHITE)])
-        queenWPlaceScore = sum([self.queenWhite[i] for i in board.pieces(chess.QUEEN, chess.WHITE)])
-        kingWPlaceScore = sum([self.kingWhite[i] for i in board.pieces(chess.KING, chess.WHITE)])
+        pawnWPlaceScore = sum([self.pawnWhite[i] for i in board.pieces(piece_type=chess.PAWN, color=chess.WHITE)])
+        bishopWPlaceScore = sum([self.bishopWhite[i] for i in board.pieces(piece_type=chess.BISHOP, color=chess.WHITE)])
+        knightWPlaceScore = sum([self.knightWhite[i] for i in board.pieces(piece_type=chess.KNIGHT, color=chess.WHITE)])
+        rookWPlaceScore = sum([self.rookWhite[i] for i in board.pieces(piece_type=chess.ROOK, color=chess.WHITE)])
+        queenWPlaceScore = sum([self.queenWhite[i] for i in board.pieces(piece_type=chess.QUEEN, color=chess.WHITE)])
+        kingWPlaceScore = sum([self.kingWhite[i] for i in board.pieces(piece_type=chess.KING, color=chess.WHITE)])
 
         n_white = 0
         n_white += len(board.pieces(piece_type=chess.PAWN, color=chess.WHITE))*10 + pawnWPlaceScore
@@ -82,12 +82,12 @@ class Utility(ABC):
         n_white += len(board.pieces(piece_type=chess.QUEEN, color=chess.WHITE))*100 + queenWPlaceScore
         n_white += len(board.pieces(piece_type=chess.KING, color=chess.WHITE))*1000 + kingWPlaceScore
 
-        pawnBPlaceScore = sum([-self.pawnWhite[chess.square_mirror(i)] for i in board.pieces(chess.PAWN, chess.BLACK)])
-        bishopBPlaceScore = sum([-self.bishopWhite[chess.square_mirror(i)] for i in board.pieces(chess.BISHOP, chess.BLACK)])
-        knightBPlaceScore = sum([-self.knightWhite[chess.square_mirror(i)] for i in board.pieces(chess.KNIGHT, chess.BLACK)])
-        rookBPlaceScore = sum([-self.rookWhite[chess.square_mirror(i)] for i in board.pieces(chess.ROOK, chess.BLACK)])
-        queenBPlaceScore = sum([-self.queenWhite[chess.square_mirror(i)] for i in board.pieces(chess.QUEEN, chess.BLACK)])
-        kingBPlaceScore = sum([-self.kingWhite[chess.square_mirror(i)] for i in board.pieces(chess.KING, chess.BLACK)])
+        pawnBPlaceScore = sum([self.pawnWhite[chess.square_mirror(i)] for i in board.pieces(piece_type=chess.PAWN, color=chess.BLACK)])
+        bishopBPlaceScore = sum([self.bishopWhite[chess.square_mirror(i)] for i in board.pieces(piece_type=chess.BISHOP, color=chess.BLACK)])
+        knightBPlaceScore = sum([self.knightWhite[chess.square_mirror(i)] for i in board.pieces(piece_type=chess.KNIGHT, color=chess.BLACK)])
+        rookBPlaceScore = sum([self.rookWhite[chess.square_mirror(i)] for i in board.pieces(piece_type=chess.ROOK, color=chess.BLACK)])
+        queenBPlaceScore = sum([self.queenWhite[chess.square_mirror(i)] for i in board.pieces(piece_type=chess.QUEEN, color=chess.BLACK)])
+        kingBPlaceScore = sum([self.kingWhite[chess.square_mirror(i)] for i in board.pieces(piece_type=chess.KING, color=chess.BLACK)])
 
         n_black = 0
         n_black += len(board.pieces(piece_type=chess.PAWN, color=chess.BLACK))*10 + pawnBPlaceScore
