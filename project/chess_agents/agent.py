@@ -43,6 +43,8 @@ class Agent(ABC):
                 board.push(move)
 
                 currentValue,worst_move = self.min_function(board,dept, alpha, beta, start_time)
+                #if (worst_move == None) & board.is_stalemate():
+                #    best_utility = 100000000
                 if currentValue > best_utility:
                     best_move = move
                     best_utility = currentValue
@@ -52,15 +54,14 @@ class Agent(ABC):
                     board.pop()
                     return best_utility,best_move
                 board.pop()
-                if (worst_move == None) & board.is_stalemate():
-                    best_utility = 100000000
+
                 """elif worst_move == None:
                     if currentValue>0:
                         best_utility = -100
                     else:
                         best_utility = 100"""
         else:
-            best_utility = -99999999
+            best_utility = -float('inf')
             best_move = None
         return best_utility,best_move
 
@@ -83,6 +84,8 @@ class Agent(ABC):
 
                 board.push(move)
                 currentValue,best_move = self.max_function(board,dept,alpha, beta,start_time)
+                #if (best_move == None) & board.is_stalemate():
+                 #   worst_utility = -100000000
                 if currentValue < worst_utility:
                     worst_move = move
                     worst_utility = currentValue
@@ -93,15 +96,14 @@ class Agent(ABC):
                     return worst_utility,worst_move
                 board.pop()
 
-                if (best_move == None) & board.is_stalemate():
-                    worst_utility = -100000000
+
                 """elif worst_move == None:
                     if currentValue>0:
                         worst_utility = 20
                     else:
                         worst_utility = -20"""
         else:
-            worst_utility = -99999999
+            worst_utility = float('inf')
             worst_move = None
         return worst_utility, worst_move
 
@@ -113,9 +115,9 @@ class Agent(ABC):
             dept = dept+1
             print("dept" + str(dept))
             if board.turn == chess.WHITE:
-                value,move = self.max_function(board,dept,-999999999,999999999, start_time)
+                value,move = self.max_function(board,dept,-float('inf'),float('inf'), start_time)
             else:
-                value, move = self.min_function(board,dept,-999999999,999999999,start_time)
+                value, move = self.min_function(board,dept,-float('inf'),float('inf'),start_time)
             if(time.time()-start_time<self.time_limit_move-self.deltaTime):
                 bestMove = move
             else:
