@@ -5,14 +5,17 @@ import chess.svg
 from project.chess_utilities.example_utility import ExampleUtility
 from project.chess_agents.example_agent import ExampleAgent
 
+from project.chess_utilities.utility import Utility
+from project.chess_agents.agent import Agent
+
 """ Two agents play against eachother until the game is finished """
 def play_self():
     # Setup a clean board
     board = chess.Board()
     # Create the white and black agent
-    white_player = ExampleAgent(ExampleUtility(), 5.0)
+    white_player = ExampleAgent(ExampleUtility(), 15.0)
     white_player.name = "White Player"
-    black_player = ExampleAgent(ExampleUtility(), 5.0)
+    black_player = Agent(Utility(), 5.0)
     black_player.name = "Black Player"
 
     running = True
@@ -26,6 +29,7 @@ def play_self():
 
         if turn_white_player:
             move = white_player.calculate_move(board)
+            print("move" + str(move))
             turn_white_player = False
             print("White plays")
         else:
