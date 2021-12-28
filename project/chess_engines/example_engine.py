@@ -11,8 +11,8 @@ if __name__ == "__main__":
     # Create your utility
     #utility =
     # Create your agent
-    agent = Agent(Utility(), 5.0)
+    agent = Agent(Utility(), 15.0)
     # Create the engine
-    engine = UciEngine("engine", "Thijs", agent)
+    engine = UciEngine("engine", "Thijs_Maxime", agent)
     # Run the engine (will loop until the game is done or exited)
     engine.engine_operation()
