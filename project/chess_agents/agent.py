@@ -20,7 +20,7 @@ class Agent(ABC):
         self.time_limit_move = time_limit_move
         self.name = "search agent chesser"
         self.author = "Maxime, Abe, Thijs"
-        self.deltaTime = 0.01
+        self.deltaTime = 0.003
 
 
 
@@ -37,14 +37,9 @@ class Agent(ABC):
             if dept <= 0:
                 currentValue = self.utility.board_value(board)
                 return currentValue,best_move
-
-
             for move in moves:
                 board.push(move)
-
                 currentValue,worst_move = self.min_function(board,dept, alpha, beta, start_time)
-                #if (worst_move == None) & board.is_stalemate():
-                #    best_utility = 100000000
                 if currentValue > best_utility:
                     best_move = move
                     best_utility = currentValue
@@ -54,12 +49,6 @@ class Agent(ABC):
                     board.pop()
                     return best_utility,best_move
                 board.pop()
-
-                """elif worst_move == None:
-                    if currentValue>0:
-                        best_utility = -100
-                    else:
-                        best_utility = 100"""
         else:
             best_utility = -float('inf')
             best_move = None
@@ -81,11 +70,8 @@ class Agent(ABC):
                 currentValue = self.utility.board_value(board)
                 return currentValue,worst_move
             for move in moves:
-
                 board.push(move)
                 currentValue,best_move = self.max_function(board,dept,alpha, beta,start_time)
-                #if (best_move == None) & board.is_stalemate():
-                 #   worst_utility = -100000000
                 if currentValue < worst_utility:
                     worst_move = move
                     worst_utility = currentValue
@@ -95,13 +81,6 @@ class Agent(ABC):
                     board.pop()
                     return worst_utility,worst_move
                 board.pop()
-
-
-                """elif worst_move == None:
-                    if currentValue>0:
-                        worst_utility = 20
-                    else:
-                        worst_utility = -20"""
         else:
             worst_utility = float('inf')
             worst_move = None
@@ -111,17 +90,19 @@ class Agent(ABC):
         start_time = time.time()
         nogtijd = True
         dept = 2
+        bestValue= "error"
         while (nogtijd):
             dept = dept+1
-            print("dept" + str(dept))
             if board.turn == chess.WHITE:
                 value,move = self.max_function(board,dept,-float('inf'),float('inf'), start_time)
             else:
                 value, move = self.min_function(board,dept,-float('inf'),float('inf'),start_time)
-            if(time.time()-start_time<self.time_limit_move-self.deltaTime):
+            if(time.time()-start_time<self.time_limit_move-self.deltaTime) or dept ==3:
                 bestMove = move
+                bestValue = value
             else:
                 nogtijd = False
-            print("value: "+ str(value))
+        print("dept" + str(dept-1))
+        print("Bestvalue: "+ str(bestValue))
         print("time" + str(time.time()-start_time))
         return bestMove
